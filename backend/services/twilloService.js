@@ -29,22 +29,29 @@ const sendOtpToPhoneNumber = async (phoneNumber) => {
 };
 
 const verifyOtp = async (phoneNumber, otp) => {
+  if (!phoneNumber || !otp) {
+    throw new Error("Phone number and OTP are required");
+  }
+
   try {
     console.log("this is my otp", otp);
     console.log("this is my phone number", phoneNumber);
-    const response = await client.verify.v2
+
+    const result = await client.verify.v2
       .services(serviceSid)
       .verificationChecks.create({
         to: phoneNumber,
         code: otp,
       });
-    console.log("this is my otp response", response);
-    return response;
+
+    console.log("this is my otp response", result);
+    return result;
   } catch (error) {
-    console.log(error);
-    throw new Error("otp verification failed");
+    console.error("OTP verification failed:", error?.message || error);
+    throw new Error("OTP verification failed");
   }
 };
+
 
 module.exports = {
   sendOtpToPhoneNumber,
