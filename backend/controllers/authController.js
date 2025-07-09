@@ -4,6 +4,7 @@ const otpGenerate = require("../utils/otpGenerator");
 const response = require("../utils/responseHandler");
 const twilioService = require("../services/twilloService");
 const generateToken = require("../utils/generateToken");
+const Conversation = require("../models/Conversation");
 
 // Step 1 : Send Otp
 const sendOtp = async (req, res) => {
@@ -140,8 +141,78 @@ const updateProfile = async (req, res) => {
   }
 };
 
+const checkAuthenticate = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    if (!userId) {
+      return response(
+        res,
+        404,
+        "unauthorized! please login before access our app"
+      );
+    }
+    const user = await User.findById(userId);
+    if (!user) {
+      return response(res, 404, "User not found");
+    }
+    return response(res, 200, "user retrieved and allow to use the app", user);
+  } catch (error) {
+    console.error(error);
+    return response(res, 500, "Internal server error");
+  }
+};
+
+const logout = (req, res) => {
+  try {
+    res.cookie("auth_token", "", { expires: new Date(0) });
+    return response(res, 200, "user logout successfully");
+  } catch (error) {
+    console.error(error);
+    return response(res, 500, "Internal server error");
+  }
+};
+
+const getAllUsers = async (req, res) => {
+  const loggedInUser = req.user.userId;
+  try {
+    const users = await User.find({ _id: { $ne: loggedInUser } })
+      .select("username profilePicture lastSeen isOnline isVerified about")
+      .lean();
+
+    const usersWithConversation = await Promise.all(
+      users.map(async (user) => {
+        const conversation = await Conversation.findOne({
+          participants: { $all: [loggedInUser, user?._id] },
+        })
+          .populate({
+            path: "lastMessage",
+            select: "content createdAt sender receiver",
+          })
+          .lean();
+
+        return {
+          ...user,
+          conversation: conversation | null,
+        };
+      })
+    );
+    return response(
+      res,
+      200,
+      "users retrieved successfully",
+      usersWithConversation
+    );
+  } catch (error) {
+    console.error(error);
+    return response(res, 500, "Internal server error");
+  }
+};
+
 module.exports = {
   sendOtp,
   verifyOtp,
   updateProfile,
+  logout,
+  checkAuthenticate,
+  getAllUsers,
 };
