@@ -9,9 +9,14 @@ const onlineUsers = new Map();
 const typingUsers = new Map();
 
 const initializeSocket = (server) => {
+  // Normalize FRONTEND_URL to avoid trailing slash mismatch
+  const frontendUrl = process.env.FRONTEND_URL
+    ? process.env.FRONTEND_URL.replace(/\/$/, "")
+    : undefined;
+
   const io = new Server(server, {
     cors: {
-      origin: process.env.FRONTEND_URL,
+      origin: frontendUrl,
       credentials: true,
       methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     },

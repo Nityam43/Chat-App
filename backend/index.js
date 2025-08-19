@@ -15,11 +15,17 @@ dotenv.config();
 const PORT = process.env.PORT;
 const app = express();
 
+// Normalize FRONTEND_URL (strip trailing slash if present)
+const frontendUrl = process.env.FRONTEND_URL
+  ? process.env.FRONTEND_URL.replace(/\/$/, "")
+  : undefined;
+
 const corsOption = {
-  origin: process.env.FRONTEND_URL,
+  origin: frontendUrl,
   credentials: true,
 };
 
+console.log("CORS origin set to:", corsOption.origin);
 app.use(cors(corsOption));
 
 // Middleware
