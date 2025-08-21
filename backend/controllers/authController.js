@@ -176,7 +176,9 @@ const getAllUsers = async (req, res) => {
   const loggedInUser = req.user.userId;
   try {
     const users = await User.find({ _id: { $ne: loggedInUser } })
-      .select("username profilePicture lastSeen isOnline isVerified about")
+      .select(
+        "username profilePicture lastSeen isOnline about phoneNumber phoneSuffix"
+      )
       .lean();
 
     const usersWithConversation = await Promise.all(
