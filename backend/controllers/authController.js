@@ -5,6 +5,7 @@ const response = require("../utils/responseHandler");
 const twilioService = require("../services/twilloService");
 const generateToken = require("../utils/generateToken");
 const Conversation = require("../models/Conversation");
+const { uploadFileToCloudinary } = require("../config/cloudinaryConfig");
 
 // Step 1 : Send Otp
 const sendOtp = async (req, res) => {
@@ -177,7 +178,7 @@ const getAllUsers = async (req, res) => {
   try {
     const users = await User.find({ _id: { $ne: loggedInUser } })
       .select(
-        "username profilePicture lastSeen isOnline about phoneNumber phoneSuffix"
+        "username email profilePicture lastSeen isOnline about phoneNumber phoneSuffix"
       )
       .lean();
 
@@ -194,7 +195,7 @@ const getAllUsers = async (req, res) => {
 
         return {
           ...user,
-          conversation: conversation | null,
+          conversation: conversation || null,
         };
       })
     );

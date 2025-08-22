@@ -20,9 +20,9 @@ exports.createStatus = async (req, res) => {
       }
       mediaUrl = uploadFile?.secure_url;
 
-      if (file.mimetype.startwith("image")) {
+      if (file.mimetype.startsWith("image")) {
         finalContentType = "image";
-      } else if (file.mimetype.startwith("video")) {
+      } else if (file.mimetype.startsWith("video")) {
         finalContentType = "video";
       } else {
         return response(res, 400, "Unsupported file type");
