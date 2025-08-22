@@ -4,6 +4,7 @@ import useThemeStore from "../../store/themeStore";
 import useUserStore from "../../store/useUserStore";
 import { FaPlus, FaSearch } from "react-icons/fa";
 import { motion } from "framer-motion";
+import formatTimestamp from "../../utils/formatTime";
 
 const ChatList = ({ contacts }) => {
   const setSelectedContact = useLayoutStore(
@@ -14,7 +15,7 @@ const ChatList = ({ contacts }) => {
   const { user } = useUserStore();
   const [searchTerms, setSearchTerms] = useState("");
   const filteredContacts = contacts?.filter((contact) => {
-    const username = contact?.username || contact?.email || 'Unknown User';
+    const username = contact?.username || contact?.email || "Unknown User";
     return username.toLowerCase().includes(searchTerms.toLowerCase());
   });
 
@@ -77,11 +78,12 @@ const ChatList = ({ contacts }) => {
               }`}
             >
               <img
-                src={contact?.profilePicture || '/default-avatar.png'}
-                alt={contact?.username || 'User'}
+                src={contact?.profilePicture || "/default-avatar.png"}
+                alt={contact?.username || "User"}
                 className="w-12 h-12 rounded-full object-cover"
                 onError={(e) => {
-                  e.target.src = 'https://via.placeholder.com/48x48/999/fff?text=U';
+                  e.target.src =
+                    "https://via.placeholder.com/48x48/999/fff?text=U";
                 }}
               />
               <div className="ml-3 flex-1">
@@ -91,18 +93,55 @@ const ChatList = ({ contacts }) => {
                       theme === "dark" ? "text-white" : "text-black"
                     }`}
                   >
-                    {contact?.username || contact?.email || 'Unknown User'}
+                    {contact?.username || contact?.email || "Unknown User"}
                   </h2>
+                  {contact?.conversation && (
+                    <span
+                      className={`text-xs ${
+                        theme === "dark" ? "text-gray-400" : "text-gray-500"
+                      }`}
+                    >
+                      {formatTimestamp(
+                        contact?.conversation?.lastMessage?.createdAt
+                      )}
+                    </span>
+                  )}
+                </div>
+                <div className="flex justify-between items-baseline">
+                  <p
+                    className={`text-sm ${
+                      theme === "dark" ? "text-gray-400" : "text-gray-500"
+                    } truncate`}
+                  >
+                    {contact?.conversation?.lastMessage?.content}
+                  </p>
+                  {contact?.conversation &&
+                    contact?.conversation?.unreadCount > 0 &&
+                    contact?.conversation?.lastMessage?.receiver ===
+                      user?._id && (
+                      <p
+                        className={`text-sm font-semibold w-6 h-6 flex items-center justify-center bg-yellow-500 ${
+                          theme === "dark" ? "text-gray-800" : "text-gray-500"
+                        } rounded-full`}
+                      >
+                        {contact?.conversation?.unreadCount}
+                      </p>
+                    )}
                 </div>
               </div>
             </motion.div>
           ))
         ) : (
-          <div className={`p-4 text-center ${
-            theme === "dark" ? "text-gray-400" : "text-gray-600"
-          }`}>
+          <div
+            className={`p-4 text-center ${
+              theme === "dark" ? "text-gray-400" : "text-gray-600"
+            }`}
+          >
             {contacts && contacts.length === 0 ? (
-              <p>No users found. Make sure you're logged in and the backend is running.</p>
+              <p>
+                No users found. Make sure you're logged in and the backend is
+                running.
+              </p>
             ) : (
               <p>No users match your search.</p>
             )}

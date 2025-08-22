@@ -199,6 +199,7 @@ const getAllUsers = async (req, res) => {
         };
       })
     );
+
     return response(
       res,
       200,
