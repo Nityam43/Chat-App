@@ -75,7 +75,7 @@ const initializeSocket = (server) => {
     });
 
     // Update message as read and notify sender
-    socket.on("message_red", async ({ messageIds, senderId }) => {
+    socket.on("message_read", async ({ messageIds, senderId }) => {
       try {
         await Message.updateMany(
           { _id: { $in: messageIds } },
