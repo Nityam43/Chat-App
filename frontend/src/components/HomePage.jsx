@@ -10,8 +10,6 @@ const HomePage = () => {
   const [loading, setLoading] = useState(true);
   const { user, isAuthenticated } = useUserStore();
   
-  console.log('HomePage - Authentication state:', { user, isAuthenticated });
-  
   const getAllUser = async () => {
     try {
       setLoading(true);
@@ -43,8 +41,6 @@ const HomePage = () => {
   useEffect(() => {
     getAllUser();
   }, []);
-
-  console.log(allUsers)
 
   return (
     <Layout>
