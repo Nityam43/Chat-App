@@ -18,6 +18,8 @@ import {
   FaMoon,
   FaQuestionCircle,
   FaSearch,
+  FaSign,
+  FaSignInAlt,
   FaSun,
   FaUser,
 } from "react-icons/fa";
@@ -236,8 +238,17 @@ const Setting = () => {
                 </button>
               </div>
 
-                      
-
+              <button
+                className={`w-full flex items-center gap-3 p-2 rounded text-red-500 ${
+                  theme === "dark"
+                    ? "text-white hover:bg-[#202c33]"
+                    : "text-black hover:bg-gray-100"
+                } mt-10 md:mt-36`}
+                onClick={handleLogout}
+              >
+                <FaSignInAlt className="h-5 w-5" />
+                Log Out
+              </button>
             </div>
           </div>
         </div>
