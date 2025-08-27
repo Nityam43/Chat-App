@@ -54,27 +54,31 @@ const ChatWindow = ({ selectedContact, setSelectedContact }) => {
     cleanup,
   } = useChatStore();
 
-  // GET online status and lastSeen
-  const online = isUserOnline(selectedContact?._id);
-  const lastSeen = getUserLastSeen(selectedContact?._id);
-  const isTyping = isUserTyping(selectedContact?._id);
-
-  useEffect(() => {
-    if (selectedContact?._id && conversations?.data?.length > 0) {
-      const conversation = conversations?.data?.find((conv) =>
-        conv.participants.some(
-          (participants) => participants._id === selectedContact?._id
+  // Protect against undefined selectedContact
+  const contactId = selectedContact?.["_id"] || null;
+  const conversationObj =
+    Array.isArray(conversations?.data) && contactId
+      ? conversations.data.find(
+          (conv) =>
+            Array.isArray(conv.participants) &&
+            conv.participants.some((p) => p && p["_id"] === contactId)
         )
-      );
-      if (conversation._id) {
-        fetchMessages(conversation._id);
-      }
-    }
-  }, [selectedContact, conversations]);
+      : null;
+  const conversationId = conversationObj?.["_id"] || null;
+  const online = contactId ? isUserOnline(contactId) : false;
+  const lastSeen = contactId ? getUserLastSeen(contactId) : null;
+  const isTyping = contactId ? isUserTyping(contactId) : false;
 
   useEffect(() => {
     fetchConversations();
   }, []);
+
+  useEffect(() => {
+    if (conversationId) {
+      fetchMessages(conversationId);
+    }
+    // eslint-disable-next-line
+  }, [contactId, conversations]);
 
   const scrollToBottom = () => {
     messageEndRef.current?.scrollIntoView({ behavior: "auto" });
@@ -82,18 +86,19 @@ const ChatWindow = ({ selectedContact, setSelectedContact }) => {
 
   useEffect(() => {
     scrollToBottom();
+    // eslint-disable-next-line
   }, [messages]);
 
   useEffect(() => {
-    if (message && selectedContact) {
-      startTyping(selectedContact?._id);
+    if (message && contactId) {
+      startTyping(contactId);
 
       if (typingTimeoutRef.current) {
         clearTimeout(typingTimeoutRef.current);
       }
 
       typingTimeoutRef.current = setTimeout(() => {
-        stopTyping(selectedContact?._id);
+        stopTyping(contactId);
       }, 2000);
     }
     return () => {
@@ -101,10 +106,11 @@ const ChatWindow = ({ selectedContact, setSelectedContact }) => {
         clearTimeout(typingTimeoutRef.current);
       }
     };
-  }, [message, selectedContact, startTyping, stopTyping]);
+    // eslint-disable-next-line
+  }, [message, contactId, startTyping, stopTyping]);
 
   const handleFileChange = (e) => {
-    const file = e.target.files[0];
+    const file = e.target.files;
     if (file) {
       setSelectedFile(file);
       setShowFileMenu(false);
@@ -115,27 +121,25 @@ const ChatWindow = ({ selectedContact, setSelectedContact }) => {
   };
 
   const handleSendMessage = async () => {
-    if (!selectedContact) return;
+    if (!contactId) return;
     setFilePreview(null);
     try {
       const formData = new FormData();
-      formData.append("senderId", user?._id);
-      formData.append("receiverId", selectedContact?._id);
+      formData.append("senderId", user?.["_id"] || "");
+      formData.append("receiverId", contactId);
 
       const status = online ? "delivered" : "send";
       formData.append("messageStatus", status);
       if (message.trim()) {
         formData.append("content", message.trim());
       }
-      // If there is a file include that too
       if (selectedFile) {
         formData.append("media", selectedFile, selectedFile.name);
       }
-
       if (!message.trim() && !selectedFile) return;
+
       await sendMessage(formData);
 
-      // Clear state
       setMessage("");
       setFilePreview(null);
       setSelectedFile(null);
@@ -149,7 +153,6 @@ const ChatWindow = ({ selectedContact, setSelectedContact }) => {
     if (!isValidate(date)) {
       return null;
     }
-
     let dateString;
     if (isToday(date)) {
       dateString = "Today";
@@ -158,7 +161,6 @@ const ChatWindow = ({ selectedContact, setSelectedContact }) => {
     } else {
       dateString = format(date, "EEEE, MMMM d");
     }
-
     return (
       <div className="flex justify-center my-4">
         <span
@@ -174,7 +176,7 @@ const ChatWindow = ({ selectedContact, setSelectedContact }) => {
     );
   };
 
-  // Group message
+  // Group messages
   const groupedMessages = Array.isArray(messages)
     ? messages.reduce((acc, message) => {
         if (!message.createdAt) return acc;
@@ -185,8 +187,6 @@ const ChatWindow = ({ selectedContact, setSelectedContact }) => {
             acc[dateString] = [];
           }
           acc[dateString].push(message);
-        } else {
-          console.error("Invalid date for message", message);
         }
         return acc;
       }, {})
@@ -196,7 +196,8 @@ const ChatWindow = ({ selectedContact, setSelectedContact }) => {
     addReaction(messageId, emoji);
   };
 
-  if (!selectedContact) {
+  // Display empty state when nothing selected
+  if (!selectedContact || !contactId) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center mx-auto h-screen text-center">
         <div className="max-w-md">
@@ -243,18 +244,15 @@ const ChatWindow = ({ selectedContact, setSelectedContact }) => {
         >
           <FaArrowLeft className="h-6 w-6" />
         </button>
-
         <img
           src={selectedContact?.profilePicture}
           alt={selectedContact?.username}
           className="w-10 h-10 rounded-full"
         />
-
         <div className="ml-3 flex-grow">
           <h2 className="font-semibold text-start">
             {selectedContact?.username}
           </h2>
-
           {isTyping ? (
             <div>Typing...</div>
           ) : (
@@ -290,9 +288,7 @@ const ChatWindow = ({ selectedContact, setSelectedContact }) => {
           <React.Fragment key={date}>
             {renderDateSeparator(new Date(date))}
             {msgs
-              .filter(
-                (msg) => msg.conversation === selectedContact?.conversation?._id
-              )
+              .filter((msg) => msg.conversation === conversationId)
               .map((msg) => (
                 <MessageBubble
                   key={msg._id || msg.tempId}
@@ -305,9 +301,9 @@ const ChatWindow = ({ selectedContact, setSelectedContact }) => {
               ))}
           </React.Fragment>
         ))}
-
         <div ref={messageEndRef} />
       </div>
+
       {filePreview && (
         <div className="relative p-2">
           <img
@@ -342,7 +338,6 @@ const ChatWindow = ({ selectedContact, setSelectedContact }) => {
             }`}
           />
         </button>
-
         {showEmojiPicker && (
           <div ref={emojiPickerRef} className="absolute left-0 bottom-16 z-50">
             <EmojiPicker
@@ -365,7 +360,6 @@ const ChatWindow = ({ selectedContact, setSelectedContact }) => {
               } mt-2`}
             />
           </button>
-
           {showFileMenu && (
             <div
               className={`absolute bottom-full left-0 mb-2 ${
@@ -387,7 +381,6 @@ const ChatWindow = ({ selectedContact, setSelectedContact }) => {
               >
                 <FaImage className="mr-2" /> Image/video
               </button>
-
               <button
                 onClick={() => fileInputRef.current.click()}
                 className={`flex items-center px-4 py-2 w-full transition-colors ${
@@ -399,7 +392,6 @@ const ChatWindow = ({ selectedContact, setSelectedContact }) => {
             </div>
           )}
         </div>
-
         <input
           type="text"
           value={message}
@@ -417,7 +409,7 @@ const ChatWindow = ({ selectedContact, setSelectedContact }) => {
           }`}
         />
         <button onClick={handleSendMessage} className="focus: outline-none">
-          <FaPaperPlane className="h-6 w-6 text-green-500"/>
+          <FaPaperPlane className="h-6 w-6 text-green-500" />
         </button>
       </div>
     </div>
