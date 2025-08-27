@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import { logoutUser } from '../../services/user.service';
-import useUserStore from '../../store/useUserStore';
-import useThemeStore from '../../store/themeStore';
-import { FaSignOutAlt, FaMoon, FaSun, FaSpinner } from 'react-icons/fa';
-import { motion } from 'framer-motion';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import { logoutUser } from "../../services/user.service";
+import useUserStore from "../../store/useUserStore";
+import useThemeStore from "../../store/themeStore";
+import { FaSignOutAlt, FaMoon, FaSun, FaSpinner } from "react-icons/fa";
+import { motion } from "framer-motion";
 
 const Setting = () => {
   const navigate = useNavigate();
@@ -18,18 +18,18 @@ const Setting = () => {
       setIsLoggingOut(true);
       await logoutUser();
       clearUser();
-      toast.success('Logged out successfully');
-      navigate('/user-login');
+      toast.success("Logged out successfully");
+      navigate("/user-login");
     } catch (error) {
-      console.error('Logout error:', error);
-      toast.error('Failed to logout. Please try again.');
+      console.error("Logout error:", error);
+      toast.error("Failed to logout. Please try again.");
     } finally {
       setIsLoggingOut(false);
     }
   };
 
   const toggleTheme = () => {
-    setTheme(theme === 'dark' ? 'light' : 'dark');
+    setTheme(theme === "dark" ? "light" : "dark");
   };
 
   return (
@@ -38,26 +38,24 @@ const Setting = () => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
       className={`h-screen p-6 ${
-        theme === 'dark'
-          ? 'bg-gray-900 text-white'
-          : 'bg-white text-gray-900'
+        theme === "dark" ? "bg-gray-900 text-white" : "bg-white text-gray-900"
       }`}
     >
       <div className="max-w-md mx-auto">
         <h1 className="text-2xl font-bold mb-6">Settings</h1>
-        
+
         <div className="space-y-4">
           {/* Theme Toggle */}
           <div
             className={`flex items-center justify-between p-4 rounded-lg cursor-pointer ${
-              theme === 'dark'
-                ? 'bg-gray-800 hover:bg-gray-700'
-                : 'bg-gray-100 hover:bg-gray-200'
+              theme === "dark"
+                ? "bg-gray-800 hover:bg-gray-700"
+                : "bg-gray-100 hover:bg-gray-200"
             } transition-colors`}
             onClick={toggleTheme}
           >
             <div className="flex items-center space-x-3">
-              {theme === 'dark' ? (
+              {theme === "dark" ? (
                 <FaMoon className="text-blue-400" />
               ) : (
                 <FaSun className="text-yellow-500" />
@@ -75,8 +73,8 @@ const Setting = () => {
             disabled={isLoggingOut}
             className={`w-full flex items-center justify-center space-x-3 p-4 rounded-lg ${
               isLoggingOut
-                ? 'bg-red-400 cursor-not-allowed'
-                : 'bg-red-500 hover:bg-red-600'
+                ? "bg-red-400 cursor-not-allowed"
+                : "bg-red-500 hover:bg-red-600"
             } text-white transition-colors`}
           >
             {isLoggingOut ? (
@@ -85,7 +83,7 @@ const Setting = () => {
               <FaSignOutAlt />
             )}
             <span className="font-medium">
-              {isLoggingOut ? 'Logging out...' : 'Logout'}
+              {isLoggingOut ? "Logging out..." : "Logout"}
             </span>
           </motion.button>
         </div>

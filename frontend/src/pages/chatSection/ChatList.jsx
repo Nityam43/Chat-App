@@ -65,7 +65,7 @@ const ChatList = ({ contacts }) => {
             <motion.div
               key={contact?._id}
               onClick={() => setSelectedContact(contact)}
-              className={`p-3 flex items-center cursor-pointer ${
+              className={`p-3 flex items-center cursor-pointer overflow-x-hidden ${
                 theme === "dark"
                   ? selectedContact?._id === contact._id
                     ? "bg-gray-700"
@@ -109,7 +109,7 @@ const ChatList = ({ contacts }) => {
                   <p
                     className={`text-sm ${
                       theme === "dark" ? "text-gray-400" : "text-gray-500"
-                    } truncate`}
+                    } truncate overflow-hidden whitespace-nowrap max-w-xs`}
                   >
                     {contact?.conversation?.lastMessage?.content}
                   </p>

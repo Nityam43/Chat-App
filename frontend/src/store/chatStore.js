@@ -48,7 +48,7 @@ export const useChatStore = create((set, get) => ({
     // Handle reaction on message
     socket.on("reaction_update", ({ messageId, reactions }) => {
       set((state) => ({
-        messages: state.message.map((msg) =>
+        messages: (state.messages ?? []).map((msg) =>
           msg._id === messageId ? { ...msg, reactions } : msg
         ),
       }));
