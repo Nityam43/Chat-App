@@ -74,7 +74,7 @@ const Layout = ({
       {isMobile && <Sidebar />}
 
       {isThemeDialogOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50">
           <div
             className={`${
               theme === "dark"
@@ -82,33 +82,36 @@ const Layout = ({
                 : "bg-white text-black"
             } p-6 rounded-lg shadow-lg max-w-sm w-full`}
           >
-            <h2 className="text-2xl font-semibold mb-4">Choose a theme</h2>
-            <div className="space-x-4">
-              <label className="flex items-center space-x-3 cursor-pointer">
+            <h2 className="text-2xl font-semibold mb-4 text-center">
+              Choose a Theme
+            </h2>
+            <div className="flex justify-center space-x-8 mb-6">
+              <label className="flex items-center space-x-2 cursor-pointer">
                 <input
                   type="radio"
                   value="light"
                   checked={theme === "light"}
                   onChange={() => setTheme("light")}
-                  className="from-radio text-blue-600"
+                  className="text-blue-600 focus:ring-blue-500"
                 />
-                <span>Light</span>
+                <span className="select-none">Light</span>
               </label>
-              <label className="flex items-center space-x-3 cursor-pointer">
+              <label className="flex items-center space-x-2 cursor-pointer">
                 <input
                   type="radio"
-                  value="light"
+                  value="dark"
                   checked={theme === "dark"}
                   onChange={() => setTheme("dark")}
-                  className="from-radio text-blue-600"
+                  className="text-blue-600 focus:ring-blue-500"
                 />
-                <span>Dark</span>
+                <span className="select-none">Dark</span>
               </label>
             </div>
-            <button onClick={toggleThemeDialog}
-            className="mt-6 w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition duration-200"
+            <button
+              onClick={toggleThemeDialog}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded transition duration-200"
             >
-                
+              Close
             </button>
           </div>
         </div>
@@ -117,10 +120,9 @@ const Layout = ({
       {/* status preview */}
       {isStatusPreviewOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-            {statusPreviewContent}
+          {statusPreviewContent}
         </div>
       )}
-
     </div>
   );
 };
