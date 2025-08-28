@@ -39,7 +39,7 @@ export const useChatStore = create((set, get) => ({
     // Update message status
     socket.on("message_status_update", ({ messageId, messageStatus }) => {
       set((state) => ({
-        messages: state.message.map((msg) =>
+        messages: (state.messages ?? []).map((msg) =>
           msg._id === messageId ? { ...msg, messageStatus } : msg
         ),
       }));

@@ -7,24 +7,6 @@
 // import { FaSignOutAlt, FaMoon, FaSun, FaSpinner } from "react-icons/fa";
 // import { motion } from "framer-motion";
 
-import { useState } from "react";
-import useThemeStore from "../../store/themeStore";
-import { logoutUser } from "../../services/user.service";
-import useUserStore from "../../store/useUserStore";
-import { toast } from "react-toastify";
-import Layout from "../../components/Layout";
-import {
-  FaComment,
-  FaMoon,
-  FaQuestionCircle,
-  FaSearch,
-  FaSign,
-  FaSignInAlt,
-  FaSun,
-  FaUser,
-} from "react-icons/fa";
-import { Link } from "react-router-dom";
-
 // const Setting = () => {
 //   const navigate = useNavigate();
 //   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -111,6 +93,25 @@ import { Link } from "react-router-dom";
 // };
 
 // export default Setting;
+
+import { useState } from "react";
+import useThemeStore from "../../store/themeStore";
+import { logoutUser } from "../../services/user.service";
+import useUserStore from "../../store/useUserStore";
+import { toast } from "react-toastify";
+import Layout from "../../components/Layout";
+import {
+  FaComment,
+  FaMoon,
+  FaQuestionCircle,
+  FaSearch,
+  FaSign,
+  FaSignInAlt,
+  FaSun,
+  FaUser,
+} from "react-icons/fa";
+import { Link } from "react-router-dom";
+
 
 const Setting = () => {
   const [isThemeDialogOpen, setIsThemeDialogOpen] = useState(false);
