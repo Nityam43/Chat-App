@@ -110,12 +110,14 @@ const ChatWindow = ({ selectedContact, setSelectedContact }) => {
   }, [message, contactId, startTyping, stopTyping]);
 
   const handleFileChange = (e) => {
-    const file = e.target.files;
+    const file = e.target.files[0];
     if (file) {
       setSelectedFile(file);
       setShowFileMenu(false);
       if (file.type.startsWith("image/")) {
         setFilePreview(URL.createObjectURL(file));
+      } else {
+        setFilePreview(null);
       }
     }
   };
