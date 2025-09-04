@@ -5,6 +5,8 @@ import useThemeStore from "../store/themeStore";
 import Sidebar from "./Sidebar";
 import { motion, AnimatePresence } from "framer-motion";
 import ChatWindow from "../pages/chatSection/ChatWindow";
+import { FaMoon, FaSun } from "react-icons/fa";
+import { MdComputer } from "react-icons/md";
 
 const Layout = ({
   children,
@@ -19,7 +21,7 @@ const Layout = ({
   );
   const location = useLocation();
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-  const { theme, setTheme } = useThemeStore();
+  const { theme, setTheme, mode } = useThemeStore();
 
   useEffect(() => {
     const handleResize = () => {
@@ -28,6 +30,20 @@ const Layout = ({
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  const themeOptions = [
+    {
+      id: "light",
+      label: "Light",
+      icon: <FaSun className="text-yellow-500" />,
+    },
+    { id: "dark", label: "Dark", icon: <FaMoon className="text-blue-400" /> },
+    {
+      id: "system",
+      label: "System",
+      icon: <MdComputer className="text-gray-500" />,
+    },
+  ];
 
   return (
     <div
@@ -73,51 +89,66 @@ const Layout = ({
       </div>
       {isMobile && <Sidebar />}
 
-      {isThemeDialogOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50">
-          <div
-            className={`${
-              theme === "dark"
-                ? "bg-[#202c33] text-white"
-                : "bg-white text-black"
-            } p-6 rounded-lg shadow-lg max-w-sm w-full`}
+      {/* Theme Dialog */}
+      <AnimatePresence>
+        {isThemeDialogOpen && (
+          <motion.div
+            className="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
           >
-            <h2 className="text-2xl font-semibold mb-4 text-center">
-              Choose a Theme
-            </h2>
-            <div className="flex justify-center space-x-8 mb-6">
-              <label className="flex items-center space-x-2 cursor-pointer">
-                <input
-                  type="radio"
-                  value="light"
-                  checked={theme === "light"}
-                  onChange={() => setTheme("light")}
-                  className="text-blue-600 focus:ring-blue-500"
-                />
-                <span className="select-none">Light</span>
-              </label>
-              <label className="flex items-center space-x-2 cursor-pointer">
-                <input
-                  type="radio"
-                  value="dark"
-                  checked={theme === "dark"}
-                  onChange={() => setTheme("dark")}
-                  className="text-blue-600 focus:ring-blue-500"
-                />
-                <span className="select-none">Dark</span>
-              </label>
-            </div>
-            <button
-              onClick={toggleThemeDialog}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded transition duration-200"
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className={`${
+                theme === "dark"
+                  ? "bg-[#202c33] text-white"
+                  : "bg-white text-black"
+              } p-6 rounded-2xl shadow-2xl max-w-sm w-full`}
             >
-              Close
-            </button>
-          </div>
-        </div>
-      )}
+              <h2 className="text-2xl font-semibold mb-4 text-center">
+                Choose a Theme
+              </h2>
 
-      {/* status preview */}
+              <div className="space-y-3 mb-6">
+                {themeOptions.map((t) => (
+                  <motion.button
+                    key={t.id}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => setTheme(t.id)}
+                    className={`flex items-center gap-4 p-4 w-full rounded-xl border transition-all shadow-sm
+                      ${
+                        mode === t.id
+                          ? "border-blue-500 bg-blue-50 dark:bg-[#2a3942]"
+                          : "border-gray-200 dark:border-gray-700"
+                      }`}
+                  >
+                    <div className="text-xl">{t.icon}</div>
+                    <span className="text-base font-medium">{t.label}</span>
+                    {mode === t.id && (
+                      <span className="ml-auto text-blue-500 font-semibold">
+                        ✓
+                      </span>
+                    )}
+                  </motion.button>
+                ))}
+              </div>
+
+              <button
+                onClick={toggleThemeDialog}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition duration-200"
+              >
+                Close
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Status Preview */}
       {isStatusPreviewOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           {statusPreviewContent}

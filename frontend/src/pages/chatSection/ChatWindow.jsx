@@ -3,7 +3,7 @@ import useThemeStore from "../../store/themeStore";
 import useUserStore from "../../store/useUserStore";
 import { useChatStore } from "../../store/chatStore";
 import { isToday, isYesterday, format } from "date-fns";
-import whatsappImage from "../../images/whatsapp_image.png";
+import whatsappImage from "../../images/WhatsApp.svg.webp";
 import {
   FaArrowLeft,
   FaEllipsisV,
@@ -199,11 +199,15 @@ const ChatWindow = ({ selectedContact, setSelectedContact }) => {
   // Display empty state when nothing selected
   if (!selectedContact || !contactId) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center mx-auto h-screen text-center">
-        <div className="max-w-md">
-          <img src={whatsappImage} alt="chat-app" className="w-full h-auto" />
+      <div className="flex-1 flex flex-col items-center justify-center mx-auto h-screen text-center px-4">
+        <div className="max-w-md w-full">
+          <img
+            src={whatsappImage}
+            alt="chat-app"
+            className="mx-auto max-w-full h-auto sm:w-60 md:w-72 lg:w-80"
+          />
           <h2
-            className={`text-3xl font-semibold mb-4 ${
+            className={`text-2xl sm:text-3xl font-semibold mb-4 ${
               theme === "dark" ? "text-white" : "text-black"
             }`}
           >
@@ -212,16 +216,16 @@ const ChatWindow = ({ selectedContact, setSelectedContact }) => {
           <p
             className={`${
               theme === "dark" ? "text-gray-400" : "text-gray-600"
-            } mb-6`}
+            } mb-6 text-sm sm:text-base`}
           >
             Choose a contact from the list on the left to begin messaging
           </p>
           <p
             className={`${
               theme === "dark" ? "text-gray-400" : "text-gray-600"
-            } text-sm mt-8 flex items-center justify-center gap-2 `}
+            } text-xs sm:text-sm mt-8 flex items-center justify-center gap-2`}
           >
-            <FaLock className="h-4 w-4" />
+            <FaLock className="h-4 w-4 shrink-0" />
             Your personal messages are end-to-end encrypted
           </p>
         </div>
