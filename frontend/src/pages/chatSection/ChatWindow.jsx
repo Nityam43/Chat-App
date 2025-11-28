@@ -52,6 +52,7 @@ const ChatWindow = ({ selectedContact, setSelectedContact }) => {
     deleteMessage,
     addReaction,
     cleanup,
+    editMessage,
   } = useChatStore();
 
   // Protect against undefined selectedContact
@@ -303,6 +304,7 @@ const ChatWindow = ({ selectedContact, setSelectedContact }) => {
                   currentUser={user}
                   onReact={handleReaction}
                   deleteMessage={deleteMessage}
+                  onEdit={editMessage}
                 />
               ))}
           </React.Fragment>

@@ -1,5 +1,6 @@
 import { io } from "socket.io-client";
 import useUserStore from "../store/useUserStore";
+import axiosInstance from "./url.service";
 
 let socket = null;
 
@@ -48,4 +49,8 @@ export const disconnectSocket = () => {
     socket.disconnect();
     socket = null;
   }
+};
+
+export const editMessage = (messageId, content) => {
+  return axiosInstance.patch(`/chats/messages/${messageId}`, { content });
 };

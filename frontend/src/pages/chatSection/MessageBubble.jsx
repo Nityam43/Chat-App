@@ -19,11 +19,14 @@ const MessageBubble = ({
   currentUser,
   onReact,
   deleteMessage,
+  onEdit,
 }) => {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [showReactions, setShowReactions] = useState(false);
   const messageRef = useRef(null);
   const [showOptions, setShowOptions] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editText, setEditText] = useState(message?.content || "");
   const optionRef = useRef(null);
 
   const emojiPickerRef = useRef(null);
@@ -46,6 +49,10 @@ const MessageBubble = ({
   `;
 
   const quickReactions = ["👍", "❤️", "😂", "😮", "😢", "🙏"];
+
+  const displayTime = message?.edited
+    ? message.editedAt || message.createdAt
+    : message.createdAt;
 
   const handleReact = (emoji) => {
     onReact(message._id, emoji);
@@ -83,7 +90,10 @@ const MessageBubble = ({
           )}
 
           <div className="self-end flex items-center justify-end gap-1 text-xs opacity-60 mt-2 ml-2">
-            <span>{format(new Date(message.createdAt), "HH:mm")}</span>
+            <span>{format(new Date(displayTime), "HH:mm")}</span>
+            {message?.edited && (
+              <span className="text-[10px] opacity-70 ml-1">(edited)</span>
+            )}
 
             {isUserMessage && (
               <>
@@ -221,17 +231,61 @@ const MessageBubble = ({
             </button>
 
             {isUserMessage && (
-              <button
-                onClick={() => {
-                  deleteMessage(message?._id);
-                  setShowOptions(false);
-                }}
-                className="flex items-center w-full px-4 py-2 gap-3 rounded-lg text-red-600"
-              >
-                <MdDelete className="text-red-600" size={16} />
-                <span>Delete</span>
-              </button>
+              <>
+                <button
+                  onClick={() => {
+                    setIsEditing(true);
+                    setShowOptions(false);
+                  }}
+                  className="flex items-center w-full px-4 py-2 gap-3 rounded-lg"
+                >
+                  <FaCheck size={16} /> <span>Edit</span>
+                </button>
+                <button
+                  onClick={() => {
+                    deleteMessage(message?._id);
+                    setShowOptions(false);
+                  }}
+                  className="flex items-center w-full px-4 py-2 gap-3 rounded-lg text-red-600"
+                >
+                  <MdDelete className="text-red-600" size={16} />
+                  <span>Delete</span>
+                </button>
+              </>
             )}
+          </div>
+        )}
+
+        {isUserMessage && message.contentType === "text" && isEditing && (
+          <div className="mt-2">
+            <div className="flex gap-2 mt-2">
+              <input
+                value={editText}
+                onChange={(e) => setEditText(e.target.value)}
+                className="px-2 py-1 rounded border"
+              />
+              <button
+                onClick={async () => {
+                  try {
+                    if (typeof onEdit === "function") {
+                      await onEdit(message._id, editText);
+                    }
+                    setIsEditing(false);
+                  } catch (err) {
+                    console.error("Edit failed", err);
+                  }
+                }}
+                className="px-3 py-1 bg-green-500 text-white rounded"
+              >
+                Save
+              </button>
+              <button
+                onClick={() => setIsEditing(false)}
+                className="px-3 py-1 bg-gray-300 rounded"
+              >
+                Cancel
+              </button>
+            </div>
           </div>
         )}
       </div>

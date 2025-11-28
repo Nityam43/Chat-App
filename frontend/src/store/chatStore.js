@@ -61,6 +61,29 @@ export const useChatStore = create((set, get) => ({
       }));
     });
 
+    // Handle edited message
+    socket.off("message_edited");
+    socket.on("message_edited", (editedMessage) => {
+      set((state) => ({
+        messages: (state.messages ?? []).map((msg) =>
+          msg._id === editedMessage._id ? { ...msg, ...editedMessage } : msg
+        ),
+      }));
+
+      // update conversation lastMessage if present
+      set((state) => {
+        const updateConversations = state.conversations?.data?.map((conv) => {
+          if (conv._id === editedMessage.conversation) {
+            return { ...conv, lastMessage: editedMessage };
+          }
+          return conv;
+        });
+        return {
+          conversations: { ...state.conversations, data: updateConversations },
+        };
+      });
+    });
+
     // Handle any message sending error
     socket.on("message_error", (error) => {
       console.error("message error", error);
@@ -333,6 +356,43 @@ export const useChatStore = create((set, get) => ({
       console.log("error deleting message", error);
       set({ error: error.response?.data?.message || error.message });
       return false;
+    }
+  },
+
+  editMessage: async (messageId, content) => {
+    try {
+      const { data } = await axiosInstance.patch(
+        `/chats/messages/${messageId}`,
+        {
+          content,
+        }
+      );
+      const messageData = data.data || data;
+
+      set((state) => ({
+        messages: (state.messages ?? []).map((msg) =>
+          msg._id === messageData._id ? { ...msg, ...messageData } : msg
+        ),
+      }));
+
+      // update conversation preview if needed
+      set((state) => {
+        const updateConversations = state.conversations?.data?.map((conv) => {
+          if (conv._id === messageData.conversation) {
+            return { ...conv, lastMessage: messageData };
+          }
+          return conv;
+        });
+        return {
+          conversations: { ...state.conversations, data: updateConversations },
+        };
+      });
+
+      return messageData;
+    } catch (error) {
+      console.error("edit message failed", error);
+      set({ error: error?.response?.data?.message || error?.message });
+      throw error;
     }
   },
 

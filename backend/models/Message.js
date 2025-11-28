@@ -20,6 +20,8 @@ const messageSchema = new mongoose.Schema(
     content: { type: String },
     imageOrVideoUrl: { type: String },
     contentType: { type: String, enum: ["image", "video", "text"] },
+    edited: { type: Boolean, default: false },
+    editedAt: { type: Date },
     reactions: [
       {
         user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },

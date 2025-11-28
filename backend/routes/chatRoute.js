@@ -7,7 +7,12 @@ const router = express.Router();
 
 // protected route
 
-router.post("/send-message", authMiddleware, multerMiddleware, chatController.sendMessage);
+router.post(
+  "/send-message",
+  authMiddleware,
+  multerMiddleware,
+  chatController.sendMessage
+);
 router.get("/conversations", authMiddleware, chatController.getConversation);
 router.get(
   "/conversations/:conversationId/messages",
@@ -27,6 +32,13 @@ router.delete(
   authMiddleware,
   multerMiddleware,
   chatController.deleteMessages
+);
+
+// edit message
+router.patch(
+  "/messages/:messageId",
+  authMiddleware,
+  chatController.editMessage
 );
 
 module.exports = router;

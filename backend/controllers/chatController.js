@@ -223,3 +223,55 @@ exports.deleteMessages = async (req, res) => {
     return response(res, 500, "Internal server error");
   }
 };
+
+// Edit a sent message (only sender can edit)
+exports.editMessage = async (req, res) => {
+  const { messageId } = req.params;
+  const { content } = req.body;
+  const userId = req.user.userId;
+
+  if (!content || !String(content).trim()) {
+    return response(res, 400, "Message content is required");
+  }
+
+  try {
+    const message = await Message.findById(messageId);
+    if (!message) {
+      return response(res, 404, "Message not found");
+    }
+
+    if (message.sender.toString() !== userId) {
+      return response(res, 403, "Not authorized to edit this message");
+    }
+
+    message.content = content;
+    message.edited = true;
+    message.editedAt = new Date();
+    await message.save();
+
+    const populatedMessage = await Message.findById(messageId)
+      .populate("sender", "username profilePicture")
+      .populate("receiver", "username profilePicture");
+
+    // Emit socket event for realtime update
+    if (req.io && req.socketUserMap) {
+      // notify both participants if connected
+      const receiverSocketId = req.socketUserMap.get(
+        message.receiver.toString()
+      );
+      const senderSocketId = req.socketUserMap.get(message.sender.toString());
+
+      if (receiverSocketId) {
+        req.io.to(receiverSocketId).emit("message_edited", populatedMessage);
+      }
+      if (senderSocketId) {
+        req.io.to(senderSocketId).emit("message_edited", populatedMessage);
+      }
+    }
+
+    return response(res, 200, "Message edited successfully", populatedMessage);
+  } catch (error) {
+    console.log("editMessage error", error);
+    return response(res, 500, "Internal server error");
+  }
+};
