@@ -31,7 +31,7 @@ const MessageBubble = ({
 
   const emojiPickerRef = useRef(null);
   const reactionsMenuRef = useRef(null);
-  const isUserMessage = message.sender._id === currentUser?._id;
+  const isUserMessage = message?.sender?._id === currentUser?._id;
 
   const bubbleClass = isUserMessage ? "flex justify-end" : "flex justify-start";
 
@@ -51,8 +51,8 @@ const MessageBubble = ({
   const quickReactions = ["👍", "❤️", "😂", "😮", "😢", "🙏"];
 
   const displayTime = message?.edited
-    ? message.editedAt || message.createdAt
-    : message.createdAt;
+    ? message?.editedAt || message?.createdAt
+    : message?.createdAt;
 
   const handleReact = (emoji) => {
     onReact(message._id, emoji);
@@ -75,17 +75,17 @@ const MessageBubble = ({
     <div className={`${bubbleClass} mb-4`}>
       <div className={`${bubbleContentClass} relative group`} ref={messageRef}>
         <div className="flex justify-center gap-2 h-auto pt-1.5 pb-1">
-          {message.contentType === "text" && (
-            <p className="mr-2">{message.content}</p>
+          {message?.contentType === "text" && (
+            <p className="mr-2">{message?.content}</p>
           )}
-          {message.contentType === "image" && (
+          {message?.contentType === "image" && (
             <div>
               <img
-                src={message.imageOrVideoUrl}
+                src={message?.imageOrVideoUrl}
                 alt="image-video"
                 className="rounded-lg max-w-xs"
               />
-              <p className="mt-1">{message.content}</p>
+              <p className="mt-1">{message?.content}</p>
             </div>
           )}
 
@@ -97,11 +97,11 @@ const MessageBubble = ({
 
             {isUserMessage && (
               <>
-                {message.messageStatus === "send" && <FaCheck size={12} />}
-                {message.messageStatus === "delivered" && (
+                {message?.messageStatus === "send" && <FaCheck size={12} />}
+                {message?.messageStatus === "delivered" && (
                   <FaCheckDouble size={12} />
                 )}
-                {message.messageStatus === "read" && (
+                {message?.messageStatus === "read" && (
                   <FaCheckDouble size={12} className="text-blue-900" />
                 )}
               </>
@@ -187,7 +187,7 @@ const MessageBubble = ({
           </div>
         )}
 
-        {message.reactions && message.reactions.length > 0 && (
+        {message?.reactions && message?.reactions.length > 0 && (
           <div
             className={`absolute ${
               isUserMessage ? "right-0" : "left-0"
@@ -196,7 +196,7 @@ const MessageBubble = ({
               transformOrigin: isUserMessage ? "bottom right" : "bottom left",
             }}
           >
-            {message.reactions.map((reaction, idx) => (
+            {message?.reactions?.map((reaction, idx) => (
               <span
                 key={idx}
                 className="h-6 w-6 flex items-center justify-center rounded-full shadow ring-1 ring-gray-200 bg-white"
@@ -219,8 +219,8 @@ const MessageBubble = ({
           >
             <button
               onClick={() => {
-                if (message.contentType === "text") {
-                  navigator.clipboard.writeText(message.content);
+                if (message?.contentType === "text") {
+                  navigator.clipboard.writeText(message?.content);
                 }
                 setShowOptions(false);
               }}
@@ -256,7 +256,7 @@ const MessageBubble = ({
           </div>
         )}
 
-        {isUserMessage && message.contentType === "text" && isEditing && (
+        {isUserMessage && message?.contentType === "text" && isEditing && (
           <div className="mt-2">
             <div className="flex gap-2 mt-2">
               <input

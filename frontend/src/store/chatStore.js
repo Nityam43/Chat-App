@@ -25,7 +25,9 @@ export const useChatStore = create((set, get) => ({
     socket.off("message_deleted");
 
     // Listen for incoming messages
-    socket.on("receive_message", (message) => {});
+    socket.on("receive_message", (message) => {
+      get().receiveMessage(message);
+    });
 
     // Confirm message delivery
     socket.on("message_send", (message) => {
@@ -271,39 +273,57 @@ export const useChatStore = create((set, get) => ({
 
     const { currentConversation, currentUser, messages } = get();
 
-    const messageExist = message.some((msg) => msg._id === message._id);
+    const messageExist = messages.some((msg) => msg._id === message._id);
     if (messageExist) return;
 
-    if (message.conversation === currentConversation) {
-      set((state) => ({
-        messages: [...state.messages, message],
-      }));
+    // Determine if the incoming message should be marked as read
+    const shouldMarkAsRead =
+      message.conversation === currentConversation &&
+      message.receiver?._id === currentUser?._id;
 
-      // Automatically mark as read
-      if (message.receiver?._id === currentUser?._id) {
-        get().markMessagesAsRead();
-      }
-    }
-
-    // Update conversation preview and unread count
     set((state) => {
-      const updateConversations = state.conversations?.data?.map((conv) => {
+      // Always update the conversation list with the new message preview
+      const updatedConversationsData = (
+        state.conversations?.data || []
+      ).map((conv) => {
         if (conv._id === message.conversation) {
           return {
             ...conv,
             lastMessage: message,
+            // Increment unread count only if the conversation is not currently open
             unreadCount:
-              message?.receiver?._id === currentUser._id
+              message.conversation !== state.currentConversation &&
+              message.receiver?._id === currentUser?._id
                 ? (conv.unreadCount || 0) + 1
-                : conv.unreadCount || 0,
+                : conv.unreadCount,
           };
         }
         return conv;
       });
+
+      const updatedConversations = {
+        ...state.conversations,
+        data: updatedConversationsData,
+      };
+
+      // If the message belongs to the currently open conversation, add it to the message list
+      if (message.conversation === state.currentConversation) {
+        return {
+          messages: [...state.messages, message],
+          conversations: updatedConversations,
+        };
+      }
+
+      // Otherwise, just update the conversations list
       return {
-        conversations: { ...state.conversations, data: updateConversations },
+        conversations: updatedConversations,
       };
     });
+
+    // If the message was for the current conversation, trigger mark as read
+    if (shouldMarkAsRead) {
+      get().markMessagesAsRead();
+    }
   },
 
   // Mark as read

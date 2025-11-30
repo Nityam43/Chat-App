@@ -294,9 +294,7 @@ const ChatWindow = ({ selectedContact, setSelectedContact }) => {
         {Object.entries(groupedMessages).map(([date, msgs]) => (
           <React.Fragment key={date}>
             {renderDateSeparator(new Date(date))}
-            {msgs
-              .filter((msg) => msg.conversation === conversationId)
-              .map((msg) => (
+            {msgs.map((msg) => (
                 <MessageBubble
                   key={msg._id || msg.tempId}
                   message={msg}
